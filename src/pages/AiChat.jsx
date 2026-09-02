@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import { FaBars } from "react-icons/fa";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatArea from "../components/ChatArea";
 import AiNavPanel from "../components/AiNavPanel";
@@ -13,55 +12,99 @@ const AiChat = () => {
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [messagesBySession, setMessagesBySession] = useState({});
   const [isTyping, setIsTyping] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // دسکتاپ: منوی باریک
+  // موبایل: منوی کشویی
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [navPanelOpen, setNavPanelOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState({ name: "کاربر", image: null });
+
+  const [userProfile, setUserProfile] = useState({
+    name: "کاربر آزمایشی",
+    image: null,
+  });
 
   useEffect(() => {
     const syncProfile = () => {
       const saved = localStorage.getItem("userProfile");
+
       if (saved) {
         try {
           const data = JSON.parse(saved);
-          setUserProfile({ name: data.name || "کاربر", image: data.image || null });
+
+          setUserProfile({
+            name: data.name || "کاربر آزمایشی",
+            image: data.image || null,
+          });
         } catch (error) {
-          console.error("Error", error);
+          console.error("Profile error:", error);
         }
       }
     };
 
     syncProfile();
+
     window.addEventListener("storage", syncProfile);
-    return () => window.removeEventListener("storage", syncProfile);
+
+    return () => {
+      window.removeEventListener("storage", syncProfile);
+    };
   }, []);
 
   const handleDeleteSession = useCallback(
     (id) => {
-      setSessions((prev) => prev.filter((session) => session.id !== id));
+      setSessions((prev) =>
+        prev.filter((session) => session.id !== id)
+      );
+
       setMessagesBySession((prev) => {
         const nextMessages = { ...prev };
         delete nextMessages[id];
         return nextMessages;
       });
-      if (activeSessionId === id) setActiveSessionId(null);
+
+      if (activeSessionId === id) {
+        setActiveSessionId(null);
+      }
     },
     [activeSessionId]
   );
 
   const handleNewChat = useCallback(() => {
     const id = generateId();
-    setSessions((prev) => [{ id, title: "گفتگوی جدید", timestamp: new Date() }, ...prev]);
+
+    setSessions((prev) => [
+      {
+        id,
+        title: "گفتگوی جدید",
+        timestamp: new Date(),
+      },
+      ...prev,
+    ]);
+
     setActiveSessionId(id);
-    setMessagesBySession((prev) => ({ ...prev, [id]: [] }));
+
+    setMessagesBySession((prev) => ({
+      ...prev,
+      [id]: [],
+    }));
+
+    // بعد از انتخاب گفتگوی جدید، منو در موبایل بسته شود
+    setSidebarOpen(false);
   }, []);
 
   const buildAssistantText = (payload) => {
     if (!payload) return "";
-    if (typeof payload === "string") return payload;
+
+    if (typeof payload === "string") {
+      return payload;
+    }
+
     if (payload.message) return payload.message;
     if (payload.detail) return payload.detail;
     if (payload.text) return payload.text;
     if (payload.response) return payload.response;
+
     return "";
   };
 
@@ -70,46 +113,96 @@ const AiChat = () => {
       if (!content.trim()) return;
 
       let sessionId = activeSessionId;
+
       if (!sessionId) {
         const id = generateId();
-        setSessions((prev) => [{ id, title: `${content.substring(0, 20)}...`, timestamp: new Date() }, ...prev]);
+
+        setSessions((prev) => [
+          {
+            id,
+            title:
+              content.length > 20
+                ? `${content.substring(0, 20)}...`
+                : content,
+            timestamp: new Date(),
+          },
+          ...prev,
+        ]);
+
         setActiveSessionId(id);
-        setMessagesBySession((prev) => ({ ...prev, [id]: [] }));
+
+        setMessagesBySession((prev) => ({
+          ...prev,
+          [id]: [],
+        }));
+
         sessionId = id;
       }
 
       const currentSessionId = sessionId;
-      const userMsg = { id: generateId(), role: "user", content, timestamp: new Date() };
+
+      const userMsg = {
+        id: generateId(),
+        role: "user",
+        content,
+        timestamp: new Date(),
+      };
+
       setMessagesBySession((prev) => ({
         ...prev,
-        [currentSessionId]: [...(prev[currentSessionId] || []), userMsg],
+        [currentSessionId]: [
+          ...(prev[currentSessionId] || []),
+          userMsg,
+        ],
       }));
 
       setIsTyping(true);
 
       try {
         if (!authService.isAuthenticated()) {
-          throw new Error("برای استفاده از AI باید وارد شوید.");
+          throw new Error(
+            "برای استفاده از AI باید وارد شوید."
+          );
         }
 
-        const result = await planService.generatePlan({ prompt: content });
-        const reply = buildAssistantText(result) || "پاسخی دریافت شد. در حال آماده‌سازی است.";
-        const aiMsg = { id: generateId(), role: "assistant", content: reply, timestamp: new Date() };
+        const result = await planService.generatePlan({
+          prompt: content,
+        });
+
+        const reply =
+          buildAssistantText(result) ||
+          "پاسخی دریافت شد. در حال آماده‌سازی است.";
+
+        const aiMsg = {
+          id: generateId(),
+          role: "assistant",
+          content: reply,
+          timestamp: new Date(),
+        };
 
         setMessagesBySession((prev) => ({
           ...prev,
-          [currentSessionId]: [...(prev[currentSessionId] || []), aiMsg],
+          [currentSessionId]: [
+            ...(prev[currentSessionId] || []),
+            aiMsg,
+          ],
         }));
       } catch (error) {
         const aiMsg = {
           id: generateId(),
           role: "assistant",
-          content: error.message || "خطا در ارتباط با سرویس AI",
+          content:
+            error.message ||
+            "خطا در ارتباط با سرویس AI",
           timestamp: new Date(),
         };
+
         setMessagesBySession((prev) => ({
           ...prev,
-          [currentSessionId]: [...(prev[currentSessionId] || []), aiMsg],
+          [currentSessionId]: [
+            ...(prev[currentSessionId] || []),
+            aiMsg,
+          ],
         }));
       } finally {
         setIsTyping(false);
@@ -118,65 +211,353 @@ const AiChat = () => {
     [activeSessionId]
   );
 
-  const activeMessages = activeSessionId && messagesBySession[activeSessionId] ? messagesBySession[activeSessionId] : [];
+  const activeMessages =
+    activeSessionId &&
+    messagesBySession[activeSessionId]
+      ? messagesBySession[activeSessionId]
+      : [];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#0a0a0c] text-white flex-col md:flex-row" dir="ltr">
-      <style>{`.no-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+    <div
+      dir="ltr"
+      className="
+        flex
+        h-[100dvh]
+        w-full
+        overflow-hidden
+        bg-[#050505]
+        text-white
+      "
+    >
+      <style>{`
+        .ai-scrollbar::-webkit-scrollbar {
+          width: 5px;
+        }
 
+        .ai-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .ai-scrollbar::-webkit-scrollbar-thumb {
+          background: #252525;
+          border-radius: 999px;
+        }
+
+        .ai-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #3a3a3a;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+
+        .no-scrollbar {
+          scrollbar-width: none;
+        }
+      `}</style>
+
+      {/* =====================================================
+          SIDEBAR
+      ===================================================== */}
+
+      {/* بک‌دراپ فقط موبایل */}
       <div
-        className={`fixed left-0 top-0 bottom-0 z-40 flex flex-col border-r border-white/5 bg-[#0a0a0c] transition-all duration-300 md:static md:left-auto md:top-auto md:bottom-auto ${
-          sidebarOpen ? "w-[75%] md:w-72" : "w-16 md:w-20"
-        }`}
+        onClick={() => setSidebarOpen(false)}
+        className={`
+          fixed
+          inset-0
+          z-40
+          bg-black/70
+          backdrop-blur-[2px]
+          transition-opacity
+          duration-300
+
+          md:hidden
+
+          ${
+            sidebarOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }
+        `}
+      />
+
+      <aside
+        className={`
+          fixed
+          left-0
+          top-0
+          bottom-0
+          z-50
+
+          flex
+          flex-col
+
+          bg-[#080808]
+          border-r
+          border-white/[0.07]
+
+          transition-all
+          duration-300
+          ease-out
+
+          ${
+            sidebarOpen
+              ? "w-[285px]"
+              : "w-[76px]"
+          }
+
+          max-md:w-[285px]
+          max-md:max-w-[86vw]
+
+          ${
+            sidebarOpen
+              ? "max-md:translate-x-0"
+              : "max-md:-translate-x-full"
+          }
+        `}
       >
-        <div className="p-4 border-b border-white/5 flex items-center justify-between h-20">
+        {/* HEADER */}
+
+        <div
+          className={`
+            h-[86px]
+            shrink-0
+            border-b
+            border-white/[0.07]
+            flex
+            items-center
+
+            ${
+              sidebarOpen
+                ? "justify-between px-5"
+                : "justify-center"
+            }
+          `}
+        >
+          {/* لوگو - دکمه باز/بسته کردن */}
           <button
-            onClick={() => setSidebarOpen((prev) => !prev)}
-            className={`p-2 text-gray-400 hover:text-[#00f2ea] transition-all hover:bg-white/5 rounded-lg ${!sidebarOpen ? "mx-auto" : ""}`}
+            type="button"
+            onClick={() =>
+              setSidebarOpen((prev) => !prev)
+            }
+            title={
+              sidebarOpen
+                ? "بستن منو"
+                : "باز کردن منو"
+            }
+            className="
+              group
+              relative
+              shrink-0
+              h-12
+              w-12
+              rounded-2xl
+              border
+              border-white/10
+              bg-[#111111]
+              flex
+              items-center
+              justify-center
+              overflow-hidden
+              transition-all
+              duration-200
+              hover:border-white/20
+              hover:bg-[#171717]
+              hover:scale-[1.03]
+              active:scale-95
+            "
           >
-            <FaBars size={20} />
+            <img
+              src="/apex-logo-new-cropped.svg.png"
+              alt="APEX"
+              className="
+                h-8
+                w-8
+                object-contain
+              "
+              onError={(event) => {
+                event.currentTarget.style.display =
+                  "none";
+
+                if (
+                  event.currentTarget
+                    .nextElementSibling
+                ) {
+                  event.currentTarget.nextElementSibling.style.display =
+                    "flex";
+                }
+              }}
+            />
+
+            <span
+              className="
+                hidden
+                absolute
+                inset-0
+                items-center
+                justify-center
+                text-xl
+                font-black
+                text-white
+              "
+            >
+              A
+            </span>
           </button>
 
-          {sidebarOpen ? (
-            <div className="flex items-center gap-3 flex-row-reverse">
-              <div className="w-11 h-11 rounded-full border border-white/10 overflow-hidden shrink-0 shadow-lg">
-                {userProfile.image ? (
-                  <img src={userProfile.image} className="w-full h-full object-cover" alt="Profile" />
-                ) : (
-                  <div className="w-full h-full bg-white/5 flex items-center justify-center text-gray-300 font-bold">
-                    {userProfile.name?.charAt(0)}
-                  </div>
-                )}
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-bold truncate text-gray-100">{userProfile.name}</p>
-              </div>
+          {sidebarOpen && (
+            <div
+              dir="rtl"
+              className="
+                flex
+                flex-col
+                items-end
+                min-w-0
+                ml-3
+              "
+            >
+              <span
+                className="
+                  text-sm
+                  font-bold
+                  text-white
+                  truncate
+                "
+              >
+                {userProfile.name}
+              </span>
+
+              <span
+                className="
+                  mt-1
+                  text-[10px]
+                  text-gray-500
+                "
+              >
+                Apex AI
+              </span>
             </div>
-          ) : null}
+          )}
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar px-2">
+        {/* CHAT SIDEBAR */}
+
+        <div
+          className="
+            flex-1
+            min-h-0
+            overflow-y-auto
+            ai-scrollbar
+            px-2
+          "
+        >
           <ChatSidebar
             sessions={sessions}
             activeSessionId={activeSessionId}
             onNewChat={handleNewChat}
-            onSelectSession={setActiveSessionId}
+            onSelectSession={(id) => {
+              setActiveSessionId(id);
+              setSidebarOpen(false);
+            }}
             onDeleteSession={handleDeleteSession}
             isOpen={sidebarOpen}
           />
         </div>
-      </div>
 
-      <div className="flex-1 relative flex flex-col min-w-0" dir="rtl">
+        {/* پایین منو */}
+
+        <div
+          className={`
+            shrink-0
+            border-t
+            border-white/[0.07]
+            p-3
+
+            ${
+              sidebarOpen
+                ? "flex justify-center"
+                : "flex justify-center"
+            }
+          `}
+        >
+          <div
+            className="
+              h-10
+              w-full
+              rounded-xl
+              border
+              border-white/[0.07]
+              bg-white/[0.025]
+              flex
+              items-center
+              justify-center
+              overflow-hidden
+            "
+          >
+            {sidebarOpen ? (
+              <span
+                dir="rtl"
+                className="
+                  text-[11px]
+                  text-gray-500
+                "
+              >
+                دستیار هوشمند Apex
+              </span>
+            ) : (
+              <span
+                className="
+                  text-xs
+                  font-bold
+                  text-gray-500
+                "
+              >
+                AI
+              </span>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* =====================================================
+          MAIN
+      ===================================================== */}
+
+      <main
+        className={`
+          flex
+          min-w-0
+          flex-1
+          flex-col
+          h-full
+
+          transition-all
+          duration-300
+
+          ${
+            sidebarOpen
+              ? "md:ml-[285px]"
+              : "md:ml-[76px]"
+          }
+        `}
+        dir="rtl"
+      >
         <ChatArea
           messages={activeMessages}
           onSendMessage={handleSendMessage}
           isTyping={isTyping}
-          onToggleNavPanel={() => setNavPanelOpen((prev) => !prev)}
+          onToggleNavPanel={() =>
+            setNavPanelOpen((prev) => !prev)
+          }
         />
-      </div>
+      </main>
 
-      <AiNavPanel isOpen={navPanelOpen} onClose={() => setNavPanelOpen(false)} />
+      {/* پنل ناوبری */}
+      <AiNavPanel
+        isOpen={navPanelOpen}
+        onClose={() => setNavPanelOpen(false)}
+      />
     </div>
   );
 };
