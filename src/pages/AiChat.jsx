@@ -5,7 +5,8 @@ import AiNavPanel from "../components/AiNavPanel";
 import { authService } from "../services/authService";
 import { planService } from "../services/planService";
 
-const generateId = () => Math.random().toString(36).substring(2, 10);
+const generateId = () =>
+  Math.random().toString(36).substring(2, 10);
 
 const AiChat = () => {
   const [sessions, setSessions] = useState([]);
@@ -13,10 +14,7 @@ const AiChat = () => {
   const [messagesBySession, setMessagesBySession] = useState({});
   const [isTyping, setIsTyping] = useState(false);
 
-  // دسکتاپ: منوی باریک
-  // موبایل: منوی کشویی
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const [navPanelOpen, setNavPanelOpen] = useState(false);
 
   const [userProfile, setUserProfile] = useState({
@@ -89,7 +87,6 @@ const AiChat = () => {
       [id]: [],
     }));
 
-    // بعد از انتخاب گفتگوی جدید، منو در موبایل بسته شود
     setSidebarOpen(false);
   }, []);
 
@@ -221,15 +218,29 @@ const AiChat = () => {
     <div
       dir="ltr"
       className="
+        fixed
+        inset-0
         flex
-        h-[100dvh]
         w-full
         overflow-hidden
-        bg-[#050505]
+        bg-[#02070c]
         text-white
       "
     >
       <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        html,
+        body,
+        #root {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          overflow: hidden;
+        }
+
         .ai-scrollbar::-webkit-scrollbar {
           width: 5px;
         }
@@ -239,12 +250,12 @@ const AiChat = () => {
         }
 
         .ai-scrollbar::-webkit-scrollbar-thumb {
-          background: #252525;
+          background: #182733;
           border-radius: 999px;
         }
 
         .ai-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #3a3a3a;
+          background: #234050;
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -256,24 +267,19 @@ const AiChat = () => {
         }
       `}</style>
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
+      {/* MOBILE BACKDROP */}
 
-      {/* بک‌دراپ فقط موبایل */}
       <div
         onClick={() => setSidebarOpen(false)}
         className={`
           fixed
           inset-0
           z-40
-          bg-black/70
-          backdrop-blur-[2px]
+          bg-black/75
+          backdrop-blur-sm
           transition-opacity
           duration-300
-
           md:hidden
-
           ${
             sidebarOpen
               ? "opacity-100 pointer-events-auto"
@@ -282,6 +288,8 @@ const AiChat = () => {
         `}
       />
 
+      {/* SIDEBAR */}
+
       <aside
         className={`
           fixed
@@ -289,14 +297,11 @@ const AiChat = () => {
           top-0
           bottom-0
           z-50
-
           flex
           flex-col
-
-          bg-[#080808]
+          bg-[#03080d]
           border-r
-          border-white/[0.07]
-
+          border-cyan-400/[0.08]
           transition-all
           duration-300
           ease-out
@@ -317,17 +322,17 @@ const AiChat = () => {
           }
         `}
       >
-        {/* HEADER */}
+
+        {/* SIDEBAR HEADER */}
 
         <div
           className={`
             h-[86px]
             shrink-0
             border-b
-            border-white/[0.07]
+            border-cyan-400/[0.08]
             flex
             items-center
-
             ${
               sidebarOpen
                 ? "justify-between px-5"
@@ -335,35 +340,30 @@ const AiChat = () => {
             }
           `}
         >
-          {/* لوگو - دکمه باز/بسته کردن */}
           <button
             type="button"
             onClick={() =>
               setSidebarOpen((prev) => !prev)
             }
-            title={
-              sidebarOpen
-                ? "بستن منو"
-                : "باز کردن منو"
-            }
             className="
               group
               relative
               shrink-0
-              h-12
-              w-12
+              h-14
+              w-14
               rounded-2xl
               border
-              border-white/10
-              bg-[#111111]
+              border-cyan-400/[0.12]
+              bg-[#071019]
               flex
               items-center
               justify-center
               overflow-hidden
               transition-all
               duration-200
-              hover:border-white/20
-              hover:bg-[#171717]
+              hover:border-cyan-400/30
+              hover:bg-[#0b1720]
+              hover:shadow-[0_0_25px_rgba(0,210,255,0.10)]
               hover:scale-[1.03]
               active:scale-95
             "
@@ -372,38 +372,11 @@ const AiChat = () => {
               src="/apex-logo-new-cropped.svg.png"
               alt="APEX"
               className="
-                h-8
-                w-8
+                h-11
+                w-11
                 object-contain
               "
-              onError={(event) => {
-                event.currentTarget.style.display =
-                  "none";
-
-                if (
-                  event.currentTarget
-                    .nextElementSibling
-                ) {
-                  event.currentTarget.nextElementSibling.style.display =
-                    "flex";
-                }
-              }}
             />
-
-            <span
-              className="
-                hidden
-                absolute
-                inset-0
-                items-center
-                justify-center
-                text-xl
-                font-black
-                text-white
-              "
-            >
-              A
-            </span>
           </button>
 
           {sidebarOpen && (
@@ -432,7 +405,7 @@ const AiChat = () => {
                 className="
                   mt-1
                   text-[10px]
-                  text-gray-500
+                  text-cyan-400
                 "
               >
                 Apex AI
@@ -465,64 +438,10 @@ const AiChat = () => {
           />
         </div>
 
-        {/* پایین منو */}
-
-        <div
-          className={`
-            shrink-0
-            border-t
-            border-white/[0.07]
-            p-3
-
-            ${
-              sidebarOpen
-                ? "flex justify-center"
-                : "flex justify-center"
-            }
-          `}
-        >
-          <div
-            className="
-              h-10
-              w-full
-              rounded-xl
-              border
-              border-white/[0.07]
-              bg-white/[0.025]
-              flex
-              items-center
-              justify-center
-              overflow-hidden
-            "
-          >
-            {sidebarOpen ? (
-              <span
-                dir="rtl"
-                className="
-                  text-[11px]
-                  text-gray-500
-                "
-              >
-                دستیار هوشمند Apex
-              </span>
-            ) : (
-              <span
-                className="
-                  text-xs
-                  font-bold
-                  text-gray-500
-                "
-              >
-                AI
-              </span>
-            )}
-          </div>
-        </div>
+        {/* اینجا عمداً footer حذف شده */}
       </aside>
 
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
+      {/* MAIN */}
 
       <main
         className={`
@@ -531,7 +450,7 @@ const AiChat = () => {
           flex-1
           flex-col
           h-full
-
+          overflow-hidden
           transition-all
           duration-300
 
@@ -553,7 +472,6 @@ const AiChat = () => {
         />
       </main>
 
-      {/* پنل ناوبری */}
       <AiNavPanel
         isOpen={navPanelOpen}
         onClose={() => setNavPanelOpen(false)}

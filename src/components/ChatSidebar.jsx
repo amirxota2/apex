@@ -20,14 +20,17 @@ const ChatSidebar = ({
         space-y-2
       "
     >
-      {/* ===============================
-          NEW CHAT
-      =============================== */}
+
+      {/* ================= NEW CHAT ================= */}
 
       <button
         type="button"
         onClick={onNewChat}
-        title={!isOpen ? "گفتگوی جدید" : undefined}
+        title={
+          !isOpen
+            ? "گفتگوی جدید"
+            : undefined
+        }
         className={`
           group
           flex
@@ -35,14 +38,15 @@ const ChatSidebar = ({
           justify-center
           rounded-2xl
           border
-          border-white/[0.08]
-          bg-[#111111]
+          border-cyan-400/[0.10]
+          bg-[#071018]
           text-white
           transition-all
           duration-200
 
-          hover:bg-[#181818]
-          hover:border-white/[0.15]
+          hover:bg-[#0a151e]
+          hover:border-cyan-400/25
+          hover:shadow-[0_0_25px_rgba(0,210,255,0.06)]
 
           ${
             isOpen
@@ -55,39 +59,63 @@ const ChatSidebar = ({
           size={18}
           strokeWidth={1.8}
           className="
-            text-gray-300
-            group-hover:text-white
+            text-gray-400
+            group-hover:text-cyan-300
             transition-colors
           "
         />
 
         {isOpen && (
-          <span className="text-sm font-medium">
+          <span
+            className="
+              text-sm
+              font-medium
+            "
+          >
             گفتگوی جدید
           </span>
         )}
       </button>
 
-      {/* ===============================
-          HISTORY
-      =============================== */}
+      {/* ================= HISTORY ================= */}
 
       {isOpen && (
-        <div className="px-2 pt-4 pb-2">
-          <p className="text-[11px] text-gray-600">
-            تاریخچه
-          </p>
+        <div
+          className="
+            px-2
+            pt-5
+            pb-2
+          "
+        >
+          <div
+            className="
+              flex
+              items-center
+              gap-2
+            "
+          >
+            <span className="text-[11px] text-gray-600">
+              تاریخچه
+            </span>
+
+            <span
+              className="
+                h-1
+                w-1
+                rounded-full
+                bg-cyan-400
+              "
+            />
+          </div>
         </div>
       )}
 
-      {/* ===============================
-          EMPTY
-      =============================== */}
+      {/* ================= EMPTY ================= */}
 
       {sessions.length === 0 && isOpen && (
         <div
           className="
-            mt-8
+            mt-10
             px-3
             text-center
           "
@@ -96,15 +124,15 @@ const ChatSidebar = ({
             className="
               mx-auto
               mb-3
-              h-10
-              w-10
-              rounded-xl
-              bg-white/[0.025]
-              border
-              border-white/[0.06]
               flex
+              h-11
+              w-11
               items-center
               justify-center
+              rounded-xl
+              border
+              border-cyan-400/[0.07]
+              bg-cyan-400/[0.025]
             "
           >
             <MessageSquare
@@ -113,15 +141,18 @@ const ChatSidebar = ({
             />
           </div>
 
-          <p className="text-xs text-gray-600">
+          <p
+            className="
+              text-xs
+              text-gray-600
+            "
+          >
             گفتگویی ثبت نشده است.
           </p>
         </div>
       )}
 
-      {/* ===============================
-          SESSIONS
-      =============================== */}
+      {/* ================= SESSIONS ================= */}
 
       <div className="space-y-1">
         {sessions.map((session) => {
@@ -142,8 +173,8 @@ const ChatSidebar = ({
               className={`
                 group
                 flex
-                items-center
                 cursor-pointer
+                items-center
                 rounded-xl
                 transition-all
                 duration-200
@@ -156,8 +187,20 @@ const ChatSidebar = ({
 
                 ${
                   active
-                    ? "bg-white/[0.08] border border-white/[0.10] text-white"
-                    : "border border-transparent text-gray-500 hover:bg-white/[0.04] hover:text-gray-300"
+                    ? `
+                      border
+                      border-cyan-400/[0.16]
+                      bg-cyan-400/[0.06]
+                      text-white
+                      shadow-[0_0_20px_rgba(0,210,255,0.04)]
+                    `
+                    : `
+                      border
+                      border-transparent
+                      text-gray-500
+                      hover:bg-white/[0.035]
+                      hover:text-gray-300
+                    `
                 }
               `}
             >
@@ -168,8 +211,8 @@ const ChatSidebar = ({
                   shrink-0
                   ${
                     active
-                      ? "text-white"
-                      : "text-gray-500"
+                      ? "text-cyan-400"
+                      : "text-gray-600"
                   }
                 `}
               />
@@ -191,7 +234,9 @@ const ChatSidebar = ({
                     type="button"
                     onClick={(event) => {
                       event.stopPropagation();
-                      onDeleteSession(session.id);
+                      onDeleteSession(
+                        session.id
+                      );
                     }}
                     className="
                       shrink-0

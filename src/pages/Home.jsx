@@ -1,21 +1,42 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FeatureCard from "../components/FeatureCard";
 import GoalCard from "../components/GoalCard";
 
 const Home = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [enteringPanel, setEnteringPanel] = useState(false);
 
-  // مدیریت اسکرول
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
 
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // توابع کمکی پروفایل
+  // ==========================================
+  // ENTER PANEL
+  // ==========================================
+
+  const handleEnterPanel = () => {
+    if (enteringPanel) return;
+
+    setEnteringPanel(true);
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 1200);
+  };
+
+  // ==========================================
+  // PROFILE
+  // ==========================================
+
   const getInitials = (name) => {
     if (!name) return "??";
 
@@ -37,7 +58,7 @@ const Home = () => {
     <div
       className="
         min-h-screen
-        bg-[#020608]
+        bg-[#010509]
         text-white
         font-vazir
         relative
@@ -46,64 +67,223 @@ const Home = () => {
       "
       dir="rtl"
     >
-      {/* =========================================
-          BACKGROUND
-      ========================================== */}
 
-      <div className="fixed inset-0 pointer-events-none">
+      {/* =====================================================
+          BACKGROUND
+      ===================================================== */}
+
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+
+        {/* MAIN IMAGE */}
+
         <div
           className="
             absolute
-            top-[-20%]
-            left-1/2
-            -translate-x-1/2
-            w-[1000px]
-            h-[600px]
-            bg-[#00f2ea]/10
-            rounded-full
-            blur-[140px]
-            animate-pulse
+            inset-0
+            bg-no-repeat
+            bg-cover
+            bg-center-top
+          "
+          style={{
+            backgroundImage:
+              "url('/65b4dd3a-57d1-47d6-b89a-60419d1d0d93.png')",
+            backgroundPosition: "center top",
+          }}
+        />
+
+        {/* DARK OVERLAY */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            bg-gradient-to-b
+            from-[#02070d]/5
+            via-[#010509]/10
+            to-[#010509]
           "
         />
 
+        {/* SIDE DARKNESS */}
+
         <div
           className="
             absolute
-            bottom-[-10%]
+            inset-0
+            bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(1,5,9,0.5)_75%,rgba(1,5,9,0.9)_100%)]
+          "
+        />
+
+        {/* CENTER LIGHT */}
+
+        <div
+          className="
+            absolute
+            top-[5%]
+            left-1/2
+            -translate-x-1/2
+            w-[700px]
+            h-[450px]
+            bg-[#00f2ea]/10
+            blur-[140px]
+            rounded-full
+          "
+        />
+
+        {/* ORANGE LIGHT */}
+
+        <div
+          className="
+            absolute
+            bottom-[-15%]
             right-[-10%]
             w-[500px]
             h-[500px]
-            bg-[#ff9d42]/10
+            bg-[#ff9d42]/[0.035]
+            blur-[140px]
             rounded-full
-            blur-[120px]
           "
         />
       </div>
 
-      {/* =========================================
-          MAIN CONTENT
-      ========================================== */}
+      {/* =====================================================
+          PANEL ENTER ANIMATION
+      ===================================================== */}
+
+      {enteringPanel && (
+        <div
+          className="
+            fixed
+            inset-0
+            z-[9999]
+            flex
+            items-center
+            justify-center
+            bg-[#010509]/90
+            backdrop-blur-xl
+            animate-[fadeIn_0.3s_ease-out]
+          "
+        >
+          <div className="flex flex-col items-center">
+
+            {/* APEX ICON */}
+
+            <div
+              className="
+                relative
+                w-20
+                h-20
+                rounded-3xl
+                bg-[#00f2ea]
+                flex
+                items-center
+                justify-center
+                text-black
+                shadow-[0_0_70px_rgba(0,242,234,0.6)]
+                animate-pulse
+              "
+            >
+              <svg
+                className="w-10 h-10"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+
+            {/* APEX */}
+
+            <div
+              className="
+                mt-6
+                text-2xl
+                font-black
+                tracking-[0.35em]
+                text-white
+              "
+              dir="ltr"
+            >
+              APEX
+            </div>
+
+            {/* STATUS */}
+
+            <div
+              className="
+                mt-4
+                flex
+                items-center
+                gap-2
+                text-sm
+                text-[#00f2ea]
+                font-medium
+              "
+            >
+              <span
+                className="
+                  w-2
+                  h-2
+                  rounded-full
+                  bg-[#00f2ea]
+                  shadow-[0_0_12px_rgba(0,242,234,0.8)]
+                  animate-pulse
+                "
+              />
+
+              در حال ورود به پنل
+            </div>
+
+            {/* LOADING BAR */}
+
+            <div
+              className="
+                mt-7
+                w-48
+                h-1
+                rounded-full
+                bg-white/10
+                overflow-hidden
+              "
+            >
+              <div
+                className="
+                  h-full
+                  bg-[#00f2ea]
+                  shadow-[0_0_15px_rgba(0,242,234,0.8)]
+                  animate-[loading_1.2s_ease-in-out_forwards]
+                "
+              />
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          MAIN
+      ===================================================== */}
 
       <div className="relative z-10">
 
-        {/* =======================================
+        {/* =====================================================
             NAVBAR
-        ======================================== */}
+        ===================================================== */}
 
         <nav
           className={`
             fixed
             top-0
-            w-full
+            right-0
+            left-0
             z-50
             transition-all
             duration-300
             px-8
-            py-6
             ${
               scrolled
-                ? "bg-[#020608]/80 backdrop-blur-xl py-4 border-b border-white/5"
-                : ""
+                ? "bg-[#020608]/75 backdrop-blur-xl py-4 border-b border-white/5"
+                : "py-6"
             }
           `}
         >
@@ -116,27 +296,66 @@ const Home = () => {
               items-center
             "
           >
-            {/* Logo + Profile */}
 
-            <div className="flex items-center gap-2">
+            {/* LOGO + PROFILE */}
 
-              <div
+            <div className="flex items-center gap-3">
+
+              {/* PROFILE */}
+
+              <Link
+                to="/profile"
                 className="
-                  bg-[#00f2ea]
-                  p-1.5
-                  rounded-lg
-                  text-black
-                  shadow-[0_0_20px_rgba(0,242,234,0.4)]
+                  w-10
+                  h-10
+                  rounded-full
+                  border-2
+                  border-[#00f2ea]/40
+                  hover:border-[#00f2ea]
+                  hover:scale-110
+                  hover:shadow-[0_0_20px_rgba(0,242,234,0.5)]
+                  transition-all
+                  duration-300
+                  p-0.5
+                  overflow-hidden
+                  block
+                  bg-[#020b10]
                 "
               >
-                <svg
-                  className="w-6 h-6"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
+                {userImage ? (
+                  <img
+                    src={userImage}
+                    alt="profile"
+                    className="
+                      w-full
+                      h-full
+                      rounded-full
+                      object-cover
+                    "
+                  />
+                ) : (
+                  <div
+                    className="
+                      w-full
+                      h-full
+                      bg-gradient-to-br
+                      from-[#00f2ea]
+                      to-[#00c2ff]
+                      rounded-full
+                      flex
+                      items-center
+                      justify-center
+                      text-[10px]
+                      font-black
+                      text-black
+                    "
+                  >
+                    {getInitials(userName)}
+                  </div>
+                )}
+              </Link>
+
+              {/* APEX */}
 
               <span
                 className="
@@ -149,70 +368,36 @@ const Home = () => {
                 Apex
               </span>
 
-              {/* Profile */}
+              {/* LIGHTNING */}
 
-              <div className="flex items-center gap-4">
-                <Link
-                  to="/profile"
-                  className="
-                    w-10
-                    h-10
-                    rounded-full
-                    border-2
-                    border-[#00f2ea]/30
-                    hover:border-[#00f2ea]
-                    hover:scale-110
-                    hover:shadow-[0_0_15px_rgba(0,242,234,0.5)]
-                    transition-all
-                    duration-300
-                    p-0.5
-                    overflow-hidden
-                    block
-                  "
+              <div
+                className="
+                  bg-[#00f2ea]
+                  p-1.5
+                  rounded-lg
+                  text-black
+                  shadow-[0_0_25px_rgba(0,242,234,0.45)]
+                "
+              >
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
                 >
-                  {userImage ? (
-                    <img
-                      src={userImage}
-                      alt="profile"
-                      className="
-                        w-full
-                        h-full
-                        rounded-full
-                        object-cover
-                      "
-                    />
-                  ) : (
-                    <div
-                      className="
-                        w-full
-                        h-full
-                        bg-gradient-to-br
-                        from-[#00f2ea]
-                        to-[#00c2ff]
-                        rounded-full
-                        flex
-                        items-center
-                        justify-center
-                        text-[10px]
-                        font-black
-                        text-black
-                        uppercase
-                      "
-                    >
-                      {getInitials(userName)}
-                    </div>
-                  )}
-                </Link>
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
+
             </div>
 
-            {/* Desktop Navigation */}
+            {/* NAV LINKS */}
 
             <div
               className="
                 hidden
                 md:flex
-                gap-10
+                items-center
+                gap-12
                 text-gray-400
                 font-medium
                 text-sm
@@ -220,95 +405,128 @@ const Home = () => {
             >
               <a
                 href="#features"
-                className="hover:text-white transition-colors"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-colors
+                "
               >
                 امکانات
               </a>
 
               <a
                 href="#pricing"
-                className="hover:text-white transition-colors"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-colors
+                "
               >
                 قیمت‌ها
               </a>
 
               <a
-                href="#"
-                className="hover:text-white transition-colors"
+                href="#about"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-colors
+                "
               >
                 درباره ما
               </a>
             </div>
 
-            {/* Login */}
+            {/* LOGIN */}
 
-            <Link
-              to="/dashboard"
+            <button
+              onClick={handleEnterPanel}
+              disabled={enteringPanel}
               className="
-                bg-white
-                text-black
-                font-black
                 px-8
                 py-3
-                rounded-full
-                hover:bg-[#00f2ea]
-                hover:shadow-[0_0_30px_rgba(0,242,234,0.5)]
-                transition-all
-                transform
-                active:scale-95
+                rounded-2xl
+                border
+                border-[#00f2ea]/40
+                bg-[#02080d]/60
+                backdrop-blur-md
+                text-[#00f2ea]
+                font-black
                 text-sm
+                shadow-[0_0_20px_rgba(0,242,234,0.05)]
+                hover:bg-[#00f2ea]
+                hover:text-black
+                hover:border-[#00f2ea]
+                hover:shadow-[0_0_30px_rgba(0,242,234,0.35)]
+                transition-all
+                duration-300
+                active:scale-95
+                disabled:opacity-70
+                disabled:cursor-wait
               "
             >
-              ورود به پنل
-            </Link>
+              {enteringPanel
+                ? "در حال ورود..."
+                : "ورود به پنل"}
+            </button>
+
           </div>
         </nav>
 
-        {/* =======================================
+        {/* =====================================================
             HERO
-        ======================================== */}
+        ===================================================== */}
 
         <main
           className="
+            min-h-screen
             flex
             flex-col
             items-center
+            justify-center
             text-center
-            pt-48
-            pb-32
-            px-4
+            px-5
+            pt-44
+            pb-20
+            relative
           "
         >
+
+          {/* HERO LIGHT */}
+
           <div
             className="
-              mb-8
-              px-6
-              py-2
+              absolute
+              top-[38%]
+              left-1/2
+              -translate-x-1/2
+              -translate-y-1/2
+              w-[600px]
+              h-[260px]
+              bg-[#00f2ea]/10
+              blur-[110px]
               rounded-full
-              border
-              border-white/10
-              bg-white/5
-              backdrop-blur-md
-              text-xs
-              font-bold
-              text-[#00f2ea]
-              animate-bounce
+              pointer-events-none
             "
-          >
-            پلتفرم هوشمند مدیریت اهداف با Apex
-          </div>
+          />
+
+          {/* TITLE */}
 
           <h1
             className="
-              text-6xl
-              md:text-8xl
+              relative
+              z-10
+              text-5xl
+              sm:text-6xl
+              md:text-7xl
+              lg:text-[76px]
               font-black
-              mb-10
-              leading-[1.1]
+              mb-8
+              leading-[1.15]
               tracking-tight
+              drop-shadow-[0_5px_30px_rgba(0,0,0,0.8)]
+              translate-y-8
             "
           >
             مرزهای پتانسیل خود را
+
             <br />
 
             <span
@@ -317,83 +535,151 @@ const Home = () => {
                 bg-clip-text
                 bg-gradient-to-r
                 from-[#00f2ea]
+                via-[#00e8ff]
                 to-[#00c2ff]
+                drop-shadow-[0_0_25px_rgba(0,242,234,0.25)]
               "
             >
-              جا‌به‌جا کنید
+              جابه‌جا کنید
             </span>
           </h1>
 
+          {/* DESCRIPTION */}
+
           <p
             className="
-              text-gray-400
-              text-xl
+              relative
+              z-10
+              text-gray-200
+              text-base
+              sm:text-lg
+              md:text-xl
               max-w-2xl
               mb-12
-              leading-relaxed
+              leading-[2]
               font-medium
+              drop-shadow-[0_3px_15px_rgba(0,0,0,0.9)]
+              translate-y-8
             "
           >
             با قدرت هوش مصنوعی Apex، برنامه‌ای کاملاً اختصاصی
             برای رشد فردی، سلامتی و مهارت‌های خود داشته باشید.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-6">
+          {/* BUTTONS */}
 
-            <Link
-              to="/dashboard"
+          <div
+            className="
+              relative
+              z-10
+              flex
+              flex-col
+              sm:flex-row
+              gap-5
+              items-center
+              justify-center
+              translate-y-8
+            "
+          >
+
+            {/* START */}
+
+            <button
+              onClick={handleEnterPanel}
+              disabled={enteringPanel}
               className="
-                bg-[#00f2ea]
+                group
+                min-w-[240px]
+                bg-[#00e1e8]
                 text-black
                 font-black
-                px-12
+                px-10
                 py-5
                 rounded-2xl
-                text-xl
-                shadow-[0_20px_50px_rgba(0,242,234,0.3)]
-                hover:scale-105
+                text-lg
+                shadow-[0_15px_45px_rgba(0,242,234,0.28)]
+                hover:bg-[#19f5ed]
+                hover:shadow-[0_20px_60px_rgba(0,242,234,0.5)]
+                hover:-translate-y-1
                 transition-all
+                duration-300
+                active:scale-95
+                flex
+                items-center
+                justify-center
+                gap-5
+                disabled:opacity-70
+                disabled:cursor-wait
               "
             >
-              رایگان شروع کنید
-            </Link>
+              <span>
+                {enteringPanel
+                  ? "در حال ورود..."
+                  : "رایگان شروع کنید"}
+              </span>
+
+              <span
+                className="
+                  text-xl
+                  group-hover:-translate-x-2
+                  transition-transform
+                  duration-300
+                "
+              >
+                ←
+              </span>
+            </button>
+
+            {/* DEMO */}
 
             <button
               className="
-                px-12
+                min-w-[200px]
+                px-10
                 py-5
                 rounded-2xl
                 border
-                border-white/10
-                bg-white/5
-                backdrop-blur-md
+                border-white/20
+                bg-white/[0.035]
+                backdrop-blur-xl
+                text-white
                 font-bold
-                hover:bg-white/10
+                text-lg
+                hover:border-[#00f2ea]/60
+                hover:bg-[#00f2ea]/10
+                hover:text-[#00f2ea]
+                hover:shadow-[0_0_30px_rgba(0,242,234,0.12)]
+                hover:-translate-y-1
                 transition-all
+                duration-300
+                active:scale-95
               "
             >
               مشاهده دمو
             </button>
 
           </div>
+
         </main>
 
-        {/* =======================================
+        {/* =====================================================
             FEATURES
-        ======================================== */}
+        ===================================================== */}
 
         <section
           id="features"
           className="
             max-w-7xl
             mx-auto
-            px-8
+            px-6
+            md:px-8
             py-32
             border-t
             border-white/5
+            relative
           "
-          dir="rtl"
         >
+
           <div className="text-center mb-20">
 
             <h2
@@ -405,6 +691,7 @@ const Home = () => {
               "
             >
               ویژگی‌های{" "}
+
               <span
                 className="
                   text-transparent
@@ -418,10 +705,11 @@ const Home = () => {
               </span>
             </h2>
 
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-400 text-lg">
               ابزارهایی که کمکت می‌کنن به اهدافت برسی
               و هر روز بهتر از دیروز باشی
             </p>
+
           </div>
 
           <div
@@ -433,6 +721,7 @@ const Home = () => {
               gap-6
             "
           >
+
             <FeatureCard
               icon="🧠"
               title="تحلیل شخصیت هوشمند"
@@ -480,126 +769,309 @@ const Home = () => {
               iconBg="bg-[#f43f5e]"
               hoverColor="hover:bg-[#f43f5e]/5 hover:border-[#f43f5e]/40"
             />
+
           </div>
         </section>
 
-        {/* =======================================
+        {/* =====================================================
             PRICING
-        ======================================== */}
+        ===================================================== */}
 
         <section
           id="pricing"
           className="
             max-w-7xl
             mx-auto
-            px-8
+            px-6
+            md:px-8
             py-24
             border-t
             border-white/5
           "
-          dir="rtl"
         >
+
           <div className="text-center mb-12">
 
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
+            <h2
+              className="
+                text-4xl
+                md:text-5xl
+                font-black
+                mb-4
+              "
+            >
               طرح‌های هوشمند
             </h2>
 
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-400 text-lg">
               طرحی را انتخاب کن و مسیر رشدت را سریع‌تر کن
             </p>
 
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            className="
+              grid
+              grid-cols-1
+              md:grid-cols-3
+              gap-6
+            "
+          >
+
+            {/* STANDARD */}
 
             <div
               className="
-                bg-[#0d121d]
+                group
+                relative
+                overflow-hidden
+                bg-white/[0.035]
+                backdrop-blur-2xl
                 border
-                border-white/5
+                border-white/[0.12]
                 rounded-[2rem]
                 p-8
                 text-center
+                shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_60px_rgba(0,0,0,0.18)]
+                hover:bg-white/[0.055]
+                hover:border-white/[0.2]
+                hover:-translate-y-1
+                transition-all
+                duration-300
               "
             >
-              <p className="text-sm text-gray-500">
-                استاندارد
-              </p>
 
-              <p className="text-3xl font-black my-4">
-                ۰
-              </p>
+              {/* GLASS LIGHT */}
 
-              <p className="text-xs text-gray-500">
-                برای شروع و تجربه اولیه
-              </p>
+              <div
+                className="
+                  absolute
+                  -top-20
+                  left-1/2
+                  -translate-x-1/2
+                  w-40
+                  h-40
+                  bg-white/5
+                  blur-3xl
+                  rounded-full
+                  pointer-events-none
+                "
+              />
+
+              <div className="relative z-10">
+
+                <p className="text-sm text-gray-300">
+                  استاندارد
+                </p>
+
+                <p className="text-4xl font-black my-5">
+                  ۰
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  برای شروع و تجربه اولیه
+                </p>
+
+                <div className="mt-7 pt-5 border-t border-white/[0.08]">
+                  <button
+                    onClick={handleEnterPanel}
+                    className="
+                      text-[#00f2ea]
+                      font-bold
+                      hover:text-white
+                      transition-colors
+                    "
+                  >
+                    جزئیات بیشتر ←
+                  </button>
+                </div>
+
+              </div>
             </div>
 
+            {/* PRO */}
+
             <div
               className="
-                bg-[#0d121d]
+                group
+                relative
+                overflow-hidden
+                bg-[#00f2ea]/[0.055]
+                backdrop-blur-2xl
                 border
-                border-[#00f2ea]/40
+                border-[#00f2ea]/50
                 rounded-[2rem]
                 p-8
                 text-center
-                shadow-[0_0_30px_rgba(0,242,234,0.1)]
+                shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_50px_rgba(0,242,234,0.12)]
+                hover:bg-[#00f2ea]/[0.08]
+                hover:-translate-y-1
+                transition-all
+                duration-300
               "
             >
-              <p className="text-sm text-gray-500">
-                پرو
-              </p>
 
-              <p className="text-3xl font-black my-4 ltr">
-                19$
-              </p>
+              {/* GLOW */}
 
-              <p className="text-xs text-gray-500">
-                همه امکانات هوشمند
-              </p>
+              <div
+                className="
+                  absolute
+                  -top-24
+                  left-1/2
+                  -translate-x-1/2
+                  w-48
+                  h-48
+                  bg-[#00f2ea]/10
+                  blur-3xl
+                  rounded-full
+                  pointer-events-none
+                "
+              />
+
+              <div className="relative z-10">
+
+                <div
+                  className="
+                    inline-flex
+                    px-4
+                    py-1
+                    rounded-full
+                    bg-[#00f2ea]/10
+                    border
+                    border-[#00f2ea]/20
+                    text-[#00f2ea]
+                    text-xs
+                    font-bold
+                    mb-3
+                  "
+                >
+                  محبوب
+                </div>
+
+                <p className="text-sm text-[#00f2ea] font-bold">
+                  پرو
+                </p>
+
+                <p className="text-4xl font-black my-5 ltr">
+                  19$
+                </p>
+
+                <p className="text-xs text-gray-300">
+                  همه امکانات هوشمند
+                </p>
+
+                <div className="mt-7 pt-5 border-t border-[#00f2ea]/10">
+
+                  <button
+                    onClick={handleEnterPanel}
+                    className="
+                      w-full
+                      bg-[#00e1e8]
+                      text-black
+                      py-3
+                      rounded-xl
+                      font-black
+                      hover:bg-[#19f5ed]
+                      hover:shadow-[0_0_25px_rgba(0,242,234,0.3)]
+                      transition-all
+                    "
+                  >
+                    انتخاب این طرح
+                  </button>
+
+                </div>
+
+              </div>
             </div>
 
+            {/* TEAM */}
+
             <div
               className="
-                bg-[#0d121d]
+                group
+                relative
+                overflow-hidden
+                bg-white/[0.035]
+                backdrop-blur-2xl
                 border
-                border-white/5
+                border-white/[0.12]
                 rounded-[2rem]
                 p-8
                 text-center
+                shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_60px_rgba(0,0,0,0.18)]
+                hover:bg-white/[0.055]
+                hover:border-white/[0.2]
+                hover:-translate-y-1
+                transition-all
+                duration-300
               "
             >
-              <p className="text-sm text-gray-500">
-                تیمی
-              </p>
 
-              <p className="text-3xl font-black my-4 ltr">
-                69$
-              </p>
+              <div
+                className="
+                  absolute
+                  -top-20
+                  left-1/2
+                  -translate-x-1/2
+                  w-40
+                  h-40
+                  bg-white/5
+                  blur-3xl
+                  rounded-full
+                  pointer-events-none
+                "
+              />
 
-              <p className="text-xs text-gray-500">
-                مناسب برای تیم‌های کوچک
-              </p>
+              <div className="relative z-10">
+
+                <p className="text-sm text-gray-300">
+                  تیمی
+                </p>
+
+                <p className="text-4xl font-black my-5 ltr">
+                  69$
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  مناسب برای تیم‌های کوچک
+                </p>
+
+                <div className="mt-7 pt-5 border-t border-white/[0.08]">
+
+                  <button
+                    onClick={handleEnterPanel}
+                    className="
+                      text-[#00f2ea]
+                      font-bold
+                      hover:text-white
+                      transition-colors
+                    "
+                  >
+                    جزئیات بیشتر ←
+                  </button>
+
+                </div>
+
+              </div>
             </div>
 
           </div>
         </section>
 
-        {/* =======================================
+        {/* =====================================================
             GOALS
-        ======================================== */}
+        ===================================================== */}
 
         <section
           className="
             max-w-7xl
             mx-auto
-            px-8
+            px-6
+            md:px-8
             py-24
-            relative
           "
-          dir="rtl"
         >
+
           <div className="text-center mb-16">
 
             <h2
@@ -611,13 +1083,15 @@ const Home = () => {
               "
             >
               برای هر{" "}
+
               <span className="text-[#00f2ea]">
                 هدفی
               </span>{" "}
+
               آماده‌ایم
             </h2>
 
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-400 text-lg">
               هر مسیری که انتخاب کنی، ما کنارتیم تا بهش برسی
             </p>
 
@@ -648,8 +1122,6 @@ const Home = () => {
               activeColor="hover:border-purple-500/50 hover:bg-purple-500/5"
               iconBg="bg-purple-500"
             />
-
-            {/* اصلاح شد: دیگر Highlight نیست */}
 
             <GoalCard
               icon="💪"
@@ -686,21 +1158,22 @@ const Home = () => {
           </div>
         </section>
 
-        {/* =======================================
+        {/* =====================================================
             CTA
-        ======================================== */}
+        ===================================================== */}
 
         <section
           className="
             max-w-7xl
             mx-auto
-            px-8
+            px-6
+            md:px-8
             py-32
             relative
             overflow-hidden
           "
-          dir="rtl"
         >
+
           <div
             className="
               absolute
@@ -727,6 +1200,7 @@ const Home = () => {
               text-center
             "
           >
+
             <div
               className="
                 w-20
@@ -744,7 +1218,8 @@ const Home = () => {
                 className="
                   w-full
                   h-full
-                  bg-[#080c14]
+                  bg-[#080c14]/70
+                  backdrop-blur-xl
                   rounded-[2rem]
                   flex
                   items-center
@@ -766,9 +1241,11 @@ const Home = () => {
               "
             >
               آماده‌ای{" "}
+
               <span className="text-[#00f2ea]">
                 نسخه بهتر
               </span>{" "}
+
               خودت بشی؟
             </h2>
 
@@ -785,8 +1262,9 @@ const Home = () => {
               هوش مصنوعی می‌تونه کمکت کنه به اهدافت برسی
             </p>
 
-            <Link
-              to="/dashboard"
+            <button
+              onClick={handleEnterPanel}
+              disabled={enteringPanel}
               className="
                 group
                 relative
@@ -799,39 +1277,49 @@ const Home = () => {
                 rounded-full
                 shadow-[0_20px_40px_rgba(0,242,234,0.3)]
                 hover:shadow-[0_25px_50px_rgba(0,242,234,0.5)]
-                transition-all
-                transform
                 hover:-translate-y-1
-                active:scale-95
+                transition-all
                 flex
                 items-center
                 gap-3
+                disabled:opacity-70
               "
             >
-              شروع سفر رشد
+              {enteringPanel
+                ? "در حال ورود..."
+                : "شروع سفر رشد"}
 
-              <span className="group-hover:translate-x-[-5px] transition-transform">
+              <span
+                className="
+                  group-hover:-translate-x-2
+                  transition-transform
+                "
+              >
                 ←
               </span>
-            </Link>
+            </button>
+
           </div>
         </section>
 
-        {/* =======================================
+        {/* =====================================================
             FOOTER
-        ======================================== */}
+        ===================================================== */}
 
         <footer
+          id="about"
           className="
             w-full
             max-w-7xl
             mx-auto
-            px-8
+            px-6
+            md:px-8
             py-20
             border-t
             border-white/5
           "
         >
+
           <div
             className="
               flex
@@ -842,7 +1330,8 @@ const Home = () => {
               gap-12
             "
           >
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-3">
 
               <div
                 className="
@@ -850,7 +1339,7 @@ const Home = () => {
                   p-2
                   rounded-xl
                   text-black
-                  shadow-lg
+                  shadow-[0_0_20px_rgba(0,242,234,0.25)]
                 "
               >
                 <svg
@@ -884,27 +1373,39 @@ const Home = () => {
                 text-sm
               "
             >
+
               <a
                 href="#"
-                className="hover:text-white transition-all"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-all
+                "
               >
                 اینستاگرام
               </a>
 
               <a
                 href="#"
-                className="hover:text-white transition-all"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-all
+                "
               >
                 تلگرام
               </a>
 
               <a
                 href="#"
-                className="hover:text-white transition-all"
+                className="
+                  hover:text-[#00f2ea]
+                  transition-all
+                "
               >
                 لینکدین
               </a>
+
             </div>
+
           </div>
 
           <p
@@ -919,9 +1420,39 @@ const Home = () => {
           >
             © 2026 Apex. ALL RIGHTS RESERVED.
           </p>
+
         </footer>
 
       </div>
+
+      {/* =====================================================
+          ANIMATION STYLES
+      ===================================================== */}
+
+      <style>
+        {`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+
+            to {
+              opacity: 1;
+            }
+          }
+
+          @keyframes loading {
+            0% {
+              width: 0%;
+            }
+
+            100% {
+              width: 100%;
+            }
+          }
+        `}
+      </style>
+
     </div>
   );
 };
